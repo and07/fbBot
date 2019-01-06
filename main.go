@@ -27,7 +27,7 @@ type ReceivedMessage struct {
 
 // Entry ...
 type Entry struct {
-	ID        int64       `json:"id"`
+	ID        string      `json:"id"`
 	Time      int64       `json:"time"`
 	Messaging []Messaging `json:"messaging"`
 }
@@ -42,12 +42,12 @@ type Messaging struct {
 
 // Sender ...
 type Sender struct {
-	ID int64 `json:"id"`
+	ID string `json:"id"`
 }
 
 // Recipient ...
 type Recipient struct {
-	ID int64 `json:"id"`
+	ID string `json:"id"`
 }
 
 // Message ...
@@ -110,7 +110,7 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func sentTextMessage(senderID int64, text string) {
+func sentTextMessage(senderID string, text string) {
 	recipient := new(Recipient)
 	recipient.ID = senderID
 	m := new(SendMessage)
@@ -130,10 +130,10 @@ func sentTextMessage(senderID int64, text string) {
 	log.Printf("res %#v", res)
 }
 
-func sendGenericMessage(senderID int64) {
+func sendGenericMessage(senderID string) {
 	messageData := fmt.Sprintf(`{
 	  recipient: {
-		id: "%d"
+		id: "%s"
 	  },
 	  message: {
 		attachment: {
