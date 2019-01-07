@@ -9,6 +9,7 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
+// Foxnews ...
 type Foxnews struct {
 	ticker *time.Ticker
 	mx     sync.RWMutex
@@ -21,6 +22,7 @@ type Foxnews struct {
 
 const urlRss = "http://feeds.foxnews.com/foxnews/latest"
 
+// NewFoxnews ...
 func NewFoxnews() *Foxnews {
 
 	f := Foxnews{}
@@ -32,6 +34,7 @@ func NewFoxnews() *Foxnews {
 	return &f
 }
 
+// Start update cache
 func (f *Foxnews) Start() {
 
 	f.ticker = time.NewTicker(30 * time.Minute)
@@ -60,15 +63,18 @@ func (f *Foxnews) Start() {
 	}()
 }
 
+// Closed update cache
 func (f *Foxnews) Closed() {
 	f.exit <- struct{}{}
 	close(f.exit)
 }
 
+// Name ...
 func (f *Foxnews) Name() string {
 	return "foxnews"
 }
 
+// GetRssData ...
 func (f *Foxnews) GetRssData() PostPageData {
 	f.mx.RLock()
 	defer f.mx.RUnlock()
