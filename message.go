@@ -58,7 +58,7 @@ func sendGenericRssMessage(senderID string, rss Rsser) {
 	}
 
 	var attachment Attachment
-	attachment.Type = "template"
+	attachment.Type = AttachmentTypeTemplate
 	attachment.Payload = &Payload{
 		TemplateType: "generic",
 		Elements:     elements,
