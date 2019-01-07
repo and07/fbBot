@@ -14,7 +14,7 @@ import (
 func sentTextMessage(senderID string, text string) {
 	recipient := new(Recipient)
 	recipient.ID = senderID
-	m := new(SendMessage)
+	m := new(SendMessageText)
 	m.Recipient = *recipient
 	m.Message.Text = text
 	b, err := json.Marshal(m)
@@ -34,7 +34,7 @@ func sentTextMessage(senderID string, text string) {
 func sendGenericRssMessage(senderID string, rss Rsser) {
 	recipient := new(Recipient)
 	recipient.ID = senderID
-	m := new(SendMessage)
+	m := new(SendMessageGeneric)
 	m.Recipient = *recipient
 
 	rssData := rss.GetRssData()

@@ -79,11 +79,18 @@ type Message struct {
 	Seq         int           `json:"seq"`
 }
 
-// SendMessage ...
-type SendMessage struct {
+// SendMessageText ...
+type SendMessageText struct {
 	Recipient Recipient `json:"recipient"`
 	Message   struct {
-		Text       string     `json:"text,omitempty"`
+		Text string `json:"text,omitempty"`
+	} `json:"message"`
+}
+
+// SendMessageGeneric ...
+type SendMessageGeneric struct {
+	Recipient Recipient `json:"recipient"`
+	Message   struct {
 		Attachment Attachment `json:"attachment,omitempty"`
 	} `json:"message"`
 }
