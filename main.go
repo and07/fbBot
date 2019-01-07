@@ -10,7 +10,6 @@ import (
 )
 
 var token = os.Getenv("TOKEN")
-var rss = os.Getenv("RSS")
 
 // const ...
 const (
