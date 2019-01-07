@@ -31,6 +31,53 @@ func sentTextMessage(senderID string, text string) {
 	log.Printf("res %#v", res)
 }
 
+func sendGenericRssMessage(senderID string, rss Rsser) {
+	recipient := new(Recipient)
+	recipient.ID = senderID
+	m := new(SendMessage)
+	m.Recipient = *recipient
+
+	rssData := rss.GetRssData()
+	var elements []*Element
+
+	for _, v := range rssData.Pages {
+		el := &Element{
+			Title:    v.Title,
+			Subtitle: v.Description,
+			ItemURL:  v.Link,
+			ImageURL: v.Image,
+		}
+
+		button := &Button{
+			Type:  "web_url",
+			URL:   v.Link,
+			Title: "Open Web URL",
+		}
+		el.Buttons = append(el.Buttons, button)
+		elements = append(elements, el)
+	}
+
+	var attachment Attachment
+	attachment.Type = "template"
+	attachment.Payload = &Payload{
+		TemplateType: "generic",
+		Elements:     elements,
+	}
+	m.Message.Attachment = attachment
+	b, err := json.Marshal(m)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	res, err := request(string(b))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	log.Printf("res %#v", res)
+}
+
 func sendGenericMessage(senderID string) {
 	messageData := fmt.Sprintf(`{
 	  recipient: {

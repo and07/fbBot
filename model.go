@@ -48,6 +48,29 @@ type Attachment struct {
 	Payload interface{}    `json:"payload,omitempty"`
 }
 
+// Element ...
+type Element struct {
+	Title    string    `json:"title"`
+	Subtitle string    `json:"subtitle"`
+	ItemURL  string    `json:"item_url"`
+	ImageURL string    `json:"image_url"`
+	Buttons  []*Button `json:"buttons"`
+}
+
+// Button ...
+type Button struct {
+	Type    string `json:"type"`
+	URL     string `json:"url,omitempty"`
+	Title   string `json:"title"`
+	Payload string `json:"payload,omitempty"`
+}
+
+// Payload ...
+type Payload struct {
+	TemplateType string     `json:"template_type"`
+	Elements     []*Element `json:"elements"`
+}
+
 // Message ...
 type Message struct {
 	ID          string        `json:"mid"`
@@ -60,6 +83,7 @@ type Message struct {
 type SendMessage struct {
 	Recipient Recipient `json:"recipient"`
 	Message   struct {
-		Text string `json:"text"`
+		Text       string     `json:"text,omitempty"`
+		Attachment Attachment `json:"attachment,omitempty"`
 	} `json:"message"`
 }
