@@ -19,6 +19,9 @@ type Messaging struct {
 	Recipient *Recipient `json:"recipient"`
 	Timestamp int64      `json:"timestamp"`
 	Message   *Message   `json:"message"`
+	Delivery  *Delivery  `json:"delivery,omitempty"`
+	Postback  *Postback  `json:"postback,omitempty"`
+	Optin     *Optin     `json:"optin,empty"`
 }
 
 // Sender ...
@@ -93,4 +96,21 @@ type SendMessageGeneric struct {
 	Message   struct {
 		Attachment Attachment `json:"attachment,omitempty"`
 	} `json:"message"`
+}
+
+// Delivery ...
+type Delivery struct {
+	MessageIDS []string `json:"mids"`
+	Watermark  int64    `json:"watermark"`
+	Seq        int      `json:"seq"`
+}
+
+// Postback ...
+type Postback struct {
+	Payload string `json:"payload"`
+}
+
+// Optin ...
+type Optin struct {
+	Ref string `json:"ref"`
 }

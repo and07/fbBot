@@ -53,10 +53,11 @@ func webhookHandler(rss Rsser) func(w http.ResponseWriter, r *http.Request) {
 
 			for _, entry := range receivedMessage.Entry {
 				for _, message := range entry.Messaging {
+					senderID := message.Sender.ID
 					if message.Message != nil {
 						messageText := message.Message.Text
 						if messageText != "" {
-							senderID := message.Sender.ID
+
 							switch messageText {
 							case "generic":
 								sendGenericMessage(senderID)
@@ -66,6 +67,10 @@ func webhookHandler(rss Rsser) func(w http.ResponseWriter, r *http.Request) {
 								sentTextMessage(senderID, message.Message.Text)
 							}
 						}
+					} else if message.Postback != nil {
+
+						sentTextMessage(senderID, fmt.Sprintf("Postback called with payload: %s", message.Postback.Payload))
+
 					}
 				}
 			}
