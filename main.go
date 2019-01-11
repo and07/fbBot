@@ -14,6 +14,7 @@ var token = os.Getenv("TOKEN")
 // const ...
 const (
 	EndPoint = "https://graph.facebook.com/v2.6/me/messages"
+	FOXNEWS  = "FOXNEWS"
 )
 
 func main() {
@@ -68,8 +69,12 @@ func webhookHandler(rss Rsser) func(w http.ResponseWriter, r *http.Request) {
 							}
 						}
 					} else if message.Postback != nil {
-
-						sentTextMessage(senderID, fmt.Sprintf("Postback called with payload: %s", message.Postback.Payload))
+						switch message.Postback.Payload {
+						case FOXNEWS:
+							sendGenericRssMessage(senderID, rss)
+						default:
+							sentTextMessage(senderID, fmt.Sprintf("Postback called with payload: %s", message.Postback.Payload))
+						}
 
 					}
 				}
