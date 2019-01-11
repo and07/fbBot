@@ -16,7 +16,7 @@ Go to heroku dashboard, go to "Setting" -> "Config Variables".
 - Value use  `PAGE_ACCESS_TOKEN` facebook app.
 
 
-### 3 
+### 3 Persistent menu
 
 ```
 curl -X POST -H "Content-Type: application/json" -d '{ 
