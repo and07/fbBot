@@ -13,7 +13,7 @@ Go to heroku dashboard, go to "Setting" -> "Config Variables".
 
 - Add "Config Vars"
 - Name -> "TOKEN"
-- Value use  `token` facebook app.
+- Value use  `PAGE_ACCESS_TOKEN` facebook app.
 
 
 ### 3 
@@ -25,6 +25,18 @@ curl -X POST -H "Content-Type: application/json" -d '{
     }
 }' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=PAGE_ACCESS_TOKEN"    
 ```
+
+```
+curl -X POST -H "Content-Type: application/json" -d '{
+    "greeting":[
+      {
+        "locale":"default",
+        "text":"Hello {{user_first_name}}!"
+      }
+    ]
+}' "https://graph.facebook.com/v2.6/me/messenger_profile?access_token=PAGE_ACCESS_TOKEN"
+```
+
 
 ```
 curl -X POST -H "Content-Type: application/json" -d '{
