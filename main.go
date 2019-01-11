@@ -13,8 +13,9 @@ var token = os.Getenv("TOKEN")
 
 // const ...
 const (
-	EndPoint = "https://graph.facebook.com/v2.6/me/messages"
-	FOXNEWS  = "FOXNEWS"
+	EndPoint            = "https://graph.facebook.com/v2.6/me/messages"
+	FOXNEWS             = "FOXNEWS"
+	GET_STARTED_PAYLOAD = "GET_STARTED_PAYLOAD"
 )
 
 func main() {
@@ -72,6 +73,8 @@ func webhookHandler(rss Rsser) func(w http.ResponseWriter, r *http.Request) {
 						switch message.Postback.Payload {
 						case FOXNEWS:
 							sendGenericRssMessage(senderID, rss)
+						case GET_STARTED_PAYLOAD:
+							sentTextMessage(senderID, "Get started")
 						default:
 							sentTextMessage(senderID, fmt.Sprintf("Postback called with payload: %s", message.Postback.Payload))
 						}
