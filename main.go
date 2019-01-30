@@ -13,7 +13,7 @@ var token = os.Getenv("TOKEN")
 
 // const ...
 const (
-	EndPoint            = "https://graph.facebook.com/v2.6/me/messages"
+	EndPoint            = "https://graph.facebook.com/v2.11/me/"
 	FOXNEWS             = "FOXNEWS"
 	GET_STARTED_PAYLOAD = "GET_STARTED_PAYLOAD"
 )
@@ -27,6 +27,12 @@ func main() {
 	http.HandleFunc("/webhook", webhookHandler(foxnews))
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
+
+	m := msg{}
+	q := m.SendMSG(foxnews)
+	defer func() {
+		close(q)
+	}()
 	http.ListenAndServe(addr, nil)
 }
 

@@ -11,6 +11,57 @@ import (
 	"time"
 )
 
+type msg struct{}
+
+func (m *msg) SendMSG(rss Rsser) chan struct{} {
+	q := make(chan struct{})
+	ticker := time.NewTicker(3 * time.Minute)
+	log.Println("SendMSG Started at", time.Now())
+
+	go func() {
+
+		for {
+			select {
+			case <-ticker.C:
+				//Call the periodic function here.
+				fmt.Println("UpCache tick")
+				msg := getMessageRss(rss)
+				b, err := json.Marshal(msg)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+				res, errRequestMessageСreatives := requestMessageСreatives(string(b))
+				if errRequestMessageСreatives != nil {
+					log.Println(errRequestMessageСreatives)
+					return
+				}
+
+				messageCreativeID := res["message_creative_id"].(int64)
+				data := fmt.Sprintf(`{    
+					"message_creative_id": %d,
+					"notification_type": "SILENT_PUSH",
+					"messaging_type": "MESSAGE_TAG",
+					"tag": "NON_PROMOTIONAL_SUBSCRIPTION"
+				}`, messageCreativeID)
+				res, errRequestBroadcastMessages := requestBroadcastMessages(data)
+				if errRequestBroadcastMessages != nil {
+					log.Println(errRequestBroadcastMessages)
+					return
+				}
+
+				broadcastID := res["broadcast_id"].(int64)
+				log.Println(" ", data, " - ", broadcastID)
+			case <-q:
+				log.Println("SendMSG Stop", time.Now())
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+	return q
+}
+
 func sentTextMessage(senderID string, text string) {
 	recipient := new(Recipient)
 	recipient.ID = senderID
@@ -23,7 +74,7 @@ func sentTextMessage(senderID string, text string) {
 		return
 	}
 
-	res, err := request(string(b))
+	res, err := requestMessages(string(b))
 	if err != nil {
 		log.Println(err)
 		return
@@ -31,11 +82,8 @@ func sentTextMessage(senderID string, text string) {
 	log.Printf("res %#v", res)
 }
 
-func sendGenericRssMessage(senderID string, rss Rsser) {
-	recipient := new(Recipient)
-	recipient.ID = senderID
-	m := new(SendMessageGeneric)
-	m.Recipient = *recipient
+func getMessageRss(rss Rsser) MessageData {
+	var m MessageData
 
 	rssData := rss.GetRssData()
 	var elements []*Element
@@ -63,14 +111,24 @@ func sendGenericRssMessage(senderID string, rss Rsser) {
 		TemplateType: "generic",
 		Elements:     elements,
 	}
-	m.Message.Attachment = attachment
+	m.Attachment = attachment
+
+	return m
+}
+
+func sendGenericRssMessage(senderID string, rss Rsser) {
+	recipient := new(Recipient)
+	recipient.ID = senderID
+	m := new(SendMessageGeneric)
+	m.Recipient = *recipient
+	m.Message = getMessageRss(rss)
 	b, err := json.Marshal(m)
 	if err != nil {
 		log.Print(err)
 		return
 	}
 
-	res, err := request(string(b))
+	res, err := requestMessages(string(b))
 	if err != nil {
 		log.Println(err)
 		return
@@ -122,7 +180,7 @@ func sendGenericMessage(senderID string) {
 	  }
 	}`, senderID)
 
-	res, err := request(messageData)
+	res, err := requestMessages(messageData)
 	if err != nil {
 		log.Println(err)
 		return
@@ -131,10 +189,10 @@ func sendGenericMessage(senderID string) {
 
 }
 
-func request(messageData string) (map[string]interface{}, error) {
+func request(urlPath, messageData string) (map[string]interface{}, error) {
 	data := []byte(messageData)
 
-	req, err := http.NewRequest("POST", EndPoint, bytes.NewBuffer(data))
+	req, err := http.NewRequest("POST", EndPoint+urlPath, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
@@ -157,4 +215,16 @@ func request(messageData string) (map[string]interface{}, error) {
 		return nil, err
 	}
 	return result, nil
+}
+
+func requestBroadcastMessages(messageData string) (map[string]interface{}, error) {
+	return request("broadcast_messages", messageData)
+}
+
+func requestMessageСreatives(messageData string) (map[string]interface{}, error) {
+	return request("message_creatives", messageData)
+}
+
+func requestMessages(messageData string) (map[string]interface{}, error) {
+	return request("messages", messageData)
 }

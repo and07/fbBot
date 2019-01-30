@@ -92,10 +92,13 @@ type SendMessageText struct {
 
 // SendMessageGeneric ...
 type SendMessageGeneric struct {
-	Recipient Recipient `json:"recipient"`
-	Message   struct {
-		Attachment Attachment `json:"attachment,omitempty"`
-	} `json:"message"`
+	Recipient Recipient   `json:"recipient"`
+	Message   MessageData `json:"message"`
+}
+
+// MessageData ...
+type MessageData struct {
+	Attachment Attachment `json:"attachment,omitempty"`
 }
 
 // Delivery ...
