@@ -96,6 +96,10 @@ type SendMessageGeneric struct {
 	Message   MessageData `json:"message"`
 }
 
+type MessagesData struct {
+	Messages []MessageData `json:"messages"`
+}
+
 // MessageData ...
 type MessageData struct {
 	Attachment Attachment `json:"attachment,omitempty"`

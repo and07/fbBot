@@ -26,11 +26,14 @@ func (m *msg) SendMSG(rss Rsser) chan struct{} {
 				//Call the periodic function here.
 				fmt.Println("UpCache tick")
 				msg := getMessageRss(rss)
-				b, err := json.Marshal(msg)
+				var msgs MessagesData
+				msgs.Messages = append(msgs.Messages, msg)
+				b, err := json.Marshal(msgs)
 				if err != nil {
 					log.Println(err)
 					return
 				}
+
 				res, errRequestMessageСreatives := requestMessageСreatives(string(b))
 				if errRequestMessageСreatives != nil {
 					log.Println(errRequestMessageСreatives)
