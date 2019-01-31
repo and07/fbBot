@@ -40,9 +40,9 @@ func (m *msg) SendMSG(rss Rsser) chan struct{} {
 					return
 				}
 
-				messageCreativeID := res["message_creative_id"].(int64)
+				messageCreativeID := res["message_creative_id"].(string)
 				data := fmt.Sprintf(`{    
-					"message_creative_id": %d,
+					"message_creative_id": %s,
 					"notification_type": "SILENT_PUSH",
 					"messaging_type": "MESSAGE_TAG",
 					"tag": "NON_PROMOTIONAL_SUBSCRIPTION"
@@ -53,7 +53,7 @@ func (m *msg) SendMSG(rss Rsser) chan struct{} {
 					return
 				}
 
-				broadcastID := res["broadcast_id"].(int64)
+				broadcastID := res["broadcast_id"].(string)
 				log.Println(" ", data, " - ", broadcastID)
 			case <-q:
 				log.Println("SendMSG Stop", time.Now())
