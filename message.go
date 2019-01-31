@@ -24,7 +24,7 @@ func (m *msg) SendMSG(rss Rsser) chan struct{} {
 			select {
 			case <-ticker.C:
 				//Call the periodic function here.
-				fmt.Println("UpCache tick")
+				fmt.Println("SendMSG tick")
 				msg := getMessageRss(rss)
 				var msgs MessagesData
 				msgs.Messages = append(msgs.Messages, msg)
