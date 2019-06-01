@@ -13,7 +13,7 @@ import (
 
 type msg struct{}
 
-func (m *msg) SendMSG(rss Rsser) chan struct{} {
+func (m *msg) SendMSG(rss ...Rsser) chan struct{} {
 	q := make(chan struct{})
 	ticker := time.NewTicker(1 * time.Hour)
 	log.Println("SendMSG Started at", time.Now())
@@ -25,36 +25,39 @@ func (m *msg) SendMSG(rss Rsser) chan struct{} {
 			case <-ticker.C:
 				//Call the periodic function here.
 				fmt.Println("SendMSG tick")
-				msg := getMessageRss(rss)
-				var msgs MessagesData
-				msgs.Messages = append(msgs.Messages, msg)
-				b, err := json.Marshal(msgs)
-				if err != nil {
-					log.Println(err)
-					return
+				for _, r := range rss {
+					msg := getMessageRss(r)
+					var msgs MessagesData
+					msgs.Messages = append(msgs.Messages, msg)
+					b, err := json.Marshal(msgs)
+					if err != nil {
+						log.Println(err)
+						return
+					}
+
+					res, errRequestMessageСreatives := requestMessageСreatives(string(b))
+					if errRequestMessageСreatives != nil {
+						log.Println(errRequestMessageСreatives)
+						return
+					}
+
+					messageCreativeID := res["message_creative_id"].(string)
+					data := fmt.Sprintf(`{    
+						"message_creative_id": %s,
+						"notification_type": "SILENT_PUSH",
+						"messaging_type": "MESSAGE_TAG",
+						"tag": "NON_PROMOTIONAL_SUBSCRIPTION"
+					}`, messageCreativeID)
+					res, errRequestBroadcastMessages := requestBroadcastMessages(data)
+					if errRequestBroadcastMessages != nil {
+						log.Println(errRequestBroadcastMessages)
+						return
+					}
+
+					broadcastID := res["broadcast_id"].(string)
+					log.Println(" ", data, " - ", broadcastID)
 				}
 
-				res, errRequestMessageСreatives := requestMessageСreatives(string(b))
-				if errRequestMessageСreatives != nil {
-					log.Println(errRequestMessageСreatives)
-					return
-				}
-
-				messageCreativeID := res["message_creative_id"].(string)
-				data := fmt.Sprintf(`{    
-					"message_creative_id": %s,
-					"notification_type": "SILENT_PUSH",
-					"messaging_type": "MESSAGE_TAG",
-					"tag": "NON_PROMOTIONAL_SUBSCRIPTION"
-				}`, messageCreativeID)
-				res, errRequestBroadcastMessages := requestBroadcastMessages(data)
-				if errRequestBroadcastMessages != nil {
-					log.Println(errRequestBroadcastMessages)
-					return
-				}
-
-				broadcastID := res["broadcast_id"].(string)
-				log.Println(" ", data, " - ", broadcastID)
 			case <-q:
 				log.Println("SendMSG Stop", time.Now())
 				ticker.Stop()

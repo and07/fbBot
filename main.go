@@ -15,32 +15,40 @@ var token = os.Getenv("TOKEN")
 const (
 	EndPoint            = "https://graph.facebook.com/v2.11/me/"
 	FOXNEWS             = "FOXNEWS"
+	OZILOO              = "OZILOO"
 	GET_STARTED_PAYLOAD = "GET_STARTED_PAYLOAD"
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	foxnews := NewFoxnews()
 	defer foxnews.Closed()
 
+	oziloo := NewOziloo()
+	defer oziloo.Closed()
+
 	http.HandleFunc("/", helloHandler)
-	http.HandleFunc("/webhook", webhookHandler(foxnews))
+	http.HandleFunc("/webhook", webhookHandler(foxnews, oziloo))
 	port := os.Getenv("PORT")
 	addr := fmt.Sprintf(":%s", port)
 
 	m := msg{}
-	q := m.SendMSG(foxnews)
+	q := m.SendMSG(foxnews, oziloo)
 	defer func() {
 		close(q)
 	}()
-	http.ListenAndServe(addr, nil)
+	if err := http.ListenAndServe(addr, nil); err != nil {
+		log.Println(err)
+	}
 }
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, Facebook Bot")
 }
 
-func webhookHandler(rss Rsser) func(w http.ResponseWriter, r *http.Request) {
+func webhookHandler(rssFN, rssOZ Rsser) func(w http.ResponseWriter, r *http.Request) {
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "GET" {
 			if r.URL.Query().Get("hub.verify_token") == token {
@@ -69,8 +77,10 @@ func webhookHandler(rss Rsser) func(w http.ResponseWriter, r *http.Request) {
 							switch messageText {
 							case "generic":
 								sendGenericMessage(senderID)
-							case "foxnews":
-								sendGenericRssMessage(senderID, rss)
+							case foxnews:
+								sendGenericRssMessage(senderID, rssFN)
+							case oziloo:
+								sendGenericRssMessage(senderID, rssOZ)
 							default:
 								sentTextMessage(senderID, message.Message.Text)
 							}
@@ -78,7 +88,9 @@ func webhookHandler(rss Rsser) func(w http.ResponseWriter, r *http.Request) {
 					} else if message.Postback != nil {
 						switch message.Postback.Payload {
 						case FOXNEWS:
-							sendGenericRssMessage(senderID, rss)
+							sendGenericRssMessage(senderID, rssFN)
+						case OZILOO:
+							sendGenericRssMessage(senderID, rssOZ)
 						case GET_STARTED_PAYLOAD:
 							sentTextMessage(senderID, "Get started")
 						default:

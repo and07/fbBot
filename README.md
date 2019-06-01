@@ -55,6 +55,17 @@ curl -X POST -H "Content-Type: application/json" -d '{
                         "payload":"FOXNEWS"
                         }
                     ]
+                },
+                {
+                    "title":"Post",
+                    "type":"nested",
+                    "call_to_actions":[
+                        {
+                        "title":"Latest Oziloo",
+                        "type":"postback",
+                        "payload":"OZILOO"
+                        }
+                    ]
                 }
             ]
         }

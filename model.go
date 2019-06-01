@@ -96,6 +96,7 @@ type SendMessageGeneric struct {
 	Message   MessageData `json:"message"`
 }
 
+// MessagesData ...
 type MessagesData struct {
 	Messages []MessageData `json:"messages"`
 }

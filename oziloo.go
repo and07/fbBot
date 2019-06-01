@@ -9,8 +9,8 @@ import (
 	"github.com/mmcdole/gofeed"
 )
 
-// Foxnews ...
-type Foxnews struct {
+// Oziloo ...
+type Oziloo struct {
 	ticker *time.Ticker
 	mx     sync.RWMutex
 	exit   chan struct{}
@@ -21,15 +21,15 @@ type Foxnews struct {
 }
 
 const (
-	urlRss  = "http://feeds.foxnews.com/foxnews/latest"
-	foxnews = "foxnews"
+	urlOzilooRss = "https://oziloo.com/es/rss"
+	oziloo       = "oziloo"
 )
 
-// NewFoxnews ...
-func NewFoxnews() *Foxnews {
+// NewOziloo ...
+func NewOziloo() *Oziloo {
 
-	f := Foxnews{}
-	f.urlRss = urlRss
+	f := Oziloo{}
+	f.urlRss = urlOzilooRss
 	f.data = make(map[string]*Post)
 	f.exit = make(chan struct{})
 	f.data = f.getData()
@@ -38,7 +38,7 @@ func NewFoxnews() *Foxnews {
 }
 
 // Start update cache
-func (f *Foxnews) Start() {
+func (f *Oziloo) Start() {
 
 	f.ticker = time.NewTicker(30 * time.Minute)
 	go func() {
@@ -67,18 +67,18 @@ func (f *Foxnews) Start() {
 }
 
 // Closed update cache
-func (f *Foxnews) Closed() {
+func (f *Oziloo) Closed() {
 	f.exit <- struct{}{}
 	close(f.exit)
 }
 
 // Name ...
-func (f *Foxnews) Name() string {
-	return foxnews
+func (f *Oziloo) Name() string {
+	return oziloo
 }
 
 // GetRssData ...
-func (f *Foxnews) GetRssData() PostPageData {
+func (f *Oziloo) GetRssData() PostPageData {
 	f.mx.RLock()
 	defer f.mx.RUnlock()
 
@@ -89,7 +89,7 @@ func (f *Foxnews) GetRssData() PostPageData {
 	}
 }
 
-func (f *Foxnews) getData() map[string]*Post {
+func (f *Oziloo) getData() map[string]*Post {
 	fp := gofeed.NewParser()
 
 	data := make(map[string]*Post)
@@ -103,30 +103,24 @@ func (f *Foxnews) getData() map[string]*Post {
 	log.Println(feed.Image.URL)
 
 	log.Printf("%#v \n", feed.Items[0].Published)
-	log.Printf("%#v \n", feed.Items[0].Categories)
+
 	for _, v := range feed.Items {
 
-		if v.Extensions["media"]["group"] != nil {
-			log.Printf("%#v \n", v.Extensions["media"]["group"][0].Children["content"][0].Attrs["url"])
+		if _, ok := data[slug.Make(v.Title)]; !ok {
 
-			if _, ok := data[slug.Make(v.Title)]; !ok {
+			t1, _ := time.Parse(time.RFC1123, v.Published)
 
-				t1, _ := time.Parse(time.RFC1123, v.Published)
-
-				data[slug.Make(v.Title)] = &Post{
-					Published:   t1.Unix(),
-					Categories:  v.Categories,
-					Title:       v.Title,
-					Slug:        slug.Make(v.Title),
-					Link:        v.Link,
-					Description: v.Description,
-					Image:       v.Extensions["media"]["group"][0].Children["content"][0].Attrs["url"],
-					SourceImage: "//global.fncstatic.com/static/orion/styles/img/fox-news/favicons/apple-touch-icon-60x60.png",
-					SourceTitle: feed.Title,
-				}
-
+			data[slug.Make(v.Title)] = &Post{
+				Published:   t1.Unix(),
+				Title:       v.Title,
+				Slug:        slug.Make(v.Title),
+				Link:        v.Link,
+				Description: v.Description,
+				Image:       "",
+				SourceImage: feed.Image.URL,
+				SourceTitle: feed.Title,
 			}
-
+			log.Printf("%#v", data[slug.Make(v.Title)])
 		}
 
 	}
