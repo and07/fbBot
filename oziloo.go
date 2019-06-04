@@ -106,21 +106,23 @@ func (f *Oziloo) getData() map[string]*Post {
 
 	for _, v := range feed.Items {
 
-		if _, ok := data[slug.Make(v.Title)]; !ok {
+		if len(v.Enclosures) > 0 {
+			if _, ok := data[slug.Make(v.Title)]; !ok {
 
-			t1, _ := time.Parse(time.RFC1123, v.Published)
+				t1, _ := time.Parse(time.RFC1123, v.Published)
 
-			data[slug.Make(v.Title)] = &Post{
-				Published:   t1.Unix(),
-				Title:       v.Title,
-				Slug:        slug.Make(v.Title),
-				Link:        v.Link,
-				Description: v.Description,
-				Image:       "",
-				SourceImage: feed.Image.URL,
-				SourceTitle: feed.Title,
+				data[slug.Make(v.Title)] = &Post{
+					Published:   t1.Unix(),
+					Title:       v.Title,
+					Slug:        slug.Make(v.Title),
+					Link:        v.Link,
+					Description: v.Description,
+					Image:       v.Enclosures[0].URL,
+					SourceImage: feed.Image.URL,
+					SourceTitle: feed.Title,
+				}
+				log.Printf("%#v", data[slug.Make(v.Title)])
 			}
-			log.Printf("%#v", data[slug.Make(v.Title)])
 		}
 
 	}
