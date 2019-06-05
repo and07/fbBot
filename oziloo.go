@@ -103,8 +103,11 @@ func (f *Oziloo) getData() map[string]*Post {
 	log.Println(feed.Image.URL)
 
 	log.Printf("%#v \n", feed.Items[0].Published)
-
+	var i int
 	for _, v := range feed.Items {
+		if i == 5 {
+			break
+		}
 
 		if len(v.Enclosures) > 0 {
 			if _, ok := data[slug.Make(v.Title)]; !ok {
@@ -123,6 +126,7 @@ func (f *Oziloo) getData() map[string]*Post {
 					SourceTitle: feed.Title,
 				}
 				log.Printf("%#v", data[slug.Make(v.Title)])
+				i++
 			}
 		}
 
