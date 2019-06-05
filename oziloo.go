@@ -113,6 +113,7 @@ func (f *Oziloo) getData() map[string]*Post {
 
 				data[slug.Make(v.Title)] = &Post{
 					Published:   t1.Unix(),
+					Categories:  []string{"test"},
 					Title:       v.Title,
 					Slug:        slug.Make(v.Title),
 					Link:        v.Link,
