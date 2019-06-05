@@ -105,7 +105,7 @@ func (f *Oziloo) getData() map[string]*Post {
 	log.Printf("%#v \n", feed.Items[0].Published)
 	var i int
 	for _, v := range feed.Items {
-		if i == 5 {
+		if i == 9 {
 			break
 		}
 
