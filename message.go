@@ -15,7 +15,7 @@ type msg struct{}
 
 func (m *msg) SendMSG(rss ...Rsser) chan struct{} {
 	q := make(chan struct{})
-	ticker := time.NewTicker(1 * time.Hour)
+	ticker := time.NewTicker(24 * time.Hour)
 	log.Println("SendMSG Started at", time.Now())
 
 	go func() {
