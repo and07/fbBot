@@ -34,7 +34,7 @@ func main() {
 	addr := fmt.Sprintf(":%s", port)
 
 	m := msg{}
-	q := m.SendMSG(foxnews, oziloo)
+	q := m.SendMSG(oziloo)
 	defer func() {
 		close(q)
 	}()
